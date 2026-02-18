@@ -1,7 +1,17 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text, TextInput } from 'react-native';
+import { typography } from '../src/theme/typography';
+
+const TextAny = Text as any;
+const TextInputAny = TextInput as any;
+
+if (!TextAny.defaultProps) TextAny.defaultProps = {};
+TextAny.defaultProps.style = [TextAny.defaultProps.style, { fontFamily: typography.regular }];
+
+if (!TextInputAny.defaultProps) TextInputAny.defaultProps = {};
+TextInputAny.defaultProps.style = [TextInputAny.defaultProps.style, { fontFamily: typography.regular }];
 
 export default function RootLayout() {
   return (

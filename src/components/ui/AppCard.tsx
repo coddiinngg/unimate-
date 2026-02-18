@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
+import { colors, shadow } from '../../theme/colors';
 
 export function AppCard({ children }: PropsWithChildren) {
   return <View style={styles.card}>{children}</View>;
@@ -8,10 +8,11 @@ export function AppCard({ children }: PropsWithChildren) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 14,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: 22,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 14,
+    padding: 15,
+    ...shadow.card,
   },
 });

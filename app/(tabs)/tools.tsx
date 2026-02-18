@@ -1,47 +1,63 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { AppButton } from '../../src/components/ui/AppButton';
+import { Ionicons } from '@expo/vector-icons';
+import { AppScreen } from '../../src/components/ui/AppScreen';
+import { Reveal } from '../../src/components/ui/Reveal';
+import { ToolFeatureCard } from '../../src/components/ui/ToolFeatureCard';
 import { colors } from '../../src/theme/colors';
 
-const tools = [
-  { label: 'AI 채팅', path: '/chat' },
-  { label: 'AI 슬라이드', path: '/slides' },
-  { label: 'AI 문서', path: '/documents' },
-  { label: 'AI 디자이너', path: '/designer' },
-  { label: 'AI 스케줄러', path: '/scheduler' },
-  { label: 'AI 영상 요약', path: '/video-summary' },
-  { label: 'AI 문제', path: '/problems' },
-  { label: 'AI 회의', path: '/meeting' },
+type ToolItem = {
+  label: string;
+  path: string;
+  subtitle: string;
+  badge: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  tone: string;
+};
+
+const tools: ToolItem[] = [
+  { label: 'AI 채팅', path: '/chat', subtitle: '수업 문맥 기반 질의응답', badge: 'Phase 2', icon: 'chatbubble-ellipses-outline', tone: '#FDF3E5' },
+  { label: 'AI 슬라이드', path: '/slides', subtitle: '목차부터 발표자료 자동 생성', badge: 'Phase 7', icon: 'easel-outline', tone: '#EAF6E9' },
+  { label: 'AI 문서', path: '/documents', subtitle: '요약/확장/정리 문서 편집', badge: 'Phase 6', icon: 'document-text-outline', tone: '#E9F2FF' },
+  { label: 'AI 디자이너', path: '/designer', subtitle: '포스터 콘셉트와 시안 생성', badge: 'Phase 8', icon: 'color-wand-outline', tone: '#F7ECFF' },
+  { label: 'AI 스케줄러', path: '/scheduler', subtitle: '과제 마감 중심 일정 추천', badge: 'Phase 9', icon: 'calendar-number-outline', tone: '#F2F5FF' },
+  { label: 'AI 영상 요약', path: '/video-summary', subtitle: '강의 영상 포인트 타임라인', badge: 'Phase 4', icon: 'videocam-outline', tone: '#E8F8FA' },
+  { label: 'AI 문제', path: '/problems', subtitle: '문제 생성, 채점, 해설까지', badge: 'Phase 5', icon: 'help-circle-outline', tone: '#FFF2E8' },
+  { label: 'AI 회의', path: '/meeting', subtitle: '녹음-전사-액션아이템 연결', badge: 'Phase 3', icon: 'people-outline', tone: '#EEF7EE' },
 ];
 
 export default function ToolsScreen() {
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>AI 도구</Text>
-        <Text style={styles.subtitle}>9개 도구를 수업 문맥과 연결해 사용합니다.</Text>
-        <View style={styles.grid}>
-          {tools.map((tool) => (
-            <AppButton
-              key={tool.path}
-              label={tool.label}
-              variant="secondary"
-              style={styles.item}
-              onPress={() => router.push(tool.path as any)}
+    <AppScreen title="Tools" contentStyle={styles.screenContent}>
+      <View style={styles.grid}>
+        {tools.map((tool, index) => (
+          <Reveal key={tool.path} delay={40 + index * 35} style={styles.cardSlot}>
+            <ToolFeatureCard
+              title={tool.label}
+              subtitle={tool.subtitle}
+              badge={tool.badge}
+              icon={tool.icon}
+              tone={tool.tone}
+              onPress={() => router.push(tool.path as never)}
             />
-          ))}
-        </View>
+          </Reveal>
+        ))}
       </View>
-    </SafeAreaView>
+    </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { flex: 1, padding: 16, gap: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: colors.text },
-  subtitle: { color: colors.textMuted },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  item: { width: '48%' },
+  screenContent: {
+    paddingTop: 6,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    justifyContent: 'space-between',
+  },
+  cardSlot: {
+    width: '48.5%',
+  },
 });

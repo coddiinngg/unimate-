@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppInput } from '../../src/components/ui/AppInput';
 import { AppButton } from '../../src/components/ui/AppButton';
+import { AppCard } from '../../src/components/ui/AppCard';
+import { AppScreen } from '../../src/components/ui/AppScreen';
 import { colors } from '../../src/theme/colors';
 import { useAuthStore } from '../../src/stores/authStore';
 
@@ -28,33 +29,49 @@ export default function RegisterScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <AppScreen title="Register" contentStyle={styles.content}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.flex}>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>회원가입</Text>
-          <Text style={styles.subtitle}>기본 정보를 입력하세요.</Text>
-          <AppInput label="이름" value={name} onChangeText={setName} placeholder="홍길동" />
-          <AppInput
-            label="이메일"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="university@email.com"
-            autoCapitalize="none"
-          />
-          <AppInput label="대학교" value={university} onChangeText={setUniversity} placeholder="OO대학교" />
-          <AppInput label="비밀번호" value={password} onChangeText={setPassword} secureTextEntry placeholder="6자 이상" />
-          <AppButton label="가입하기" onPress={handleRegister} />
-          <AppButton label="로그인으로 돌아가기" variant="secondary" onPress={() => router.replace('/(auth)/login')} />
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <AppCard>
+            <View style={styles.form}>
+              <Text style={styles.formTitle}>새 계정 만들기</Text>
+              <AppInput label="이름" value={name} onChangeText={setName} placeholder="홍길동" />
+              <AppInput
+                label="이메일"
+                value={email}
+                onChangeText={setEmail}
+                placeholder="university@email.com"
+                autoCapitalize="none"
+              />
+              <AppInput label="대학교" value={university} onChangeText={setUniversity} placeholder="OO대학교" />
+              <AppInput label="비밀번호" value={password} onChangeText={setPassword} secureTextEntry placeholder="6자 이상" />
+              <AppButton label="가입하기" onPress={handleRegister} />
+              <AppButton label="로그인으로 돌아가기" variant="secondary" onPress={() => router.replace('/(auth)/login')} />
+            </View>
+          </AppCard>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  flex: { flex: 1 },
-  content: { gap: 14, padding: 20 },
-  title: { fontSize: 30, fontWeight: '800', color: colors.text, marginTop: 20 },
-  subtitle: { color: colors.textMuted, marginBottom: 8 },
+  content: {
+    paddingTop: 8,
+  },
+  flex: {
+    flex: 1,
+  },
+  scroll: {
+    paddingBottom: 24,
+  },
+  form: {
+    gap: 12,
+  },
+  formTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: colors.text,
+    marginBottom: 2,
+  },
 });
