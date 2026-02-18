@@ -1,24 +1,14 @@
-import { Redirect, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
-import { useAuthStore } from '../src/stores/authStore';
 
 export default function RootLayout() {
-  const { isAuthenticated, hasOnboarded } = useAuthStore();
-
-  if (!isAuthenticated) {
-    return <Redirect href="/(auth)/login" />;
-  }
-
-  if (!hasOnboarded) {
-    return <Redirect href="/(auth)/onboarding" />;
-  }
-
   return (
     <GestureHandlerRootView style={styles.container}>
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+        <Stack.Screen name="index" />
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="class/[classId]" />
@@ -36,7 +26,5 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
 });
