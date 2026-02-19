@@ -39,10 +39,60 @@ export default function ClassDetailScreen() {
       <AppCard>
         <Text style={styles.sectionTitle}>연결된 AI 작업</Text>
         <View style={styles.actions}>
-          <AppButton label="채팅" variant="secondary" onPress={() => router.push('/chat')} style={styles.action} />
-          <AppButton label="문서" variant="secondary" onPress={() => router.push('/documents')} style={styles.action} />
-          <AppButton label="문제" variant="secondary" onPress={() => router.push('/problems')} style={styles.action} />
-          <AppButton label="회의" variant="secondary" onPress={() => router.push('/meeting')} style={styles.action} />
+          <AppButton
+            label="채팅"
+            variant="secondary"
+            onPress={() => router.push(`/chat?classId=${encodeURIComponent(classItem.id)}`)}
+            style={styles.action}
+          />
+          <AppButton
+            label="문서"
+            variant="secondary"
+            onPress={() => router.push(`/documents?classId=${encodeURIComponent(classItem.id)}`)}
+            style={styles.action}
+          />
+          <AppButton
+            label="문제"
+            variant="secondary"
+            onPress={() => router.push(`/problems?classId=${encodeURIComponent(classItem.id)}`)}
+            style={styles.action}
+          />
+          <AppButton
+            label="회의"
+            variant="secondary"
+            onPress={() => router.push(`/meeting?classId=${encodeURIComponent(classItem.id)}`)}
+            style={styles.action}
+          />
+          <AppButton
+            label="영상요약"
+            variant="secondary"
+            onPress={() => router.push(`/video-summary?classId=${encodeURIComponent(classItem.id)}`)}
+            style={styles.action}
+          />
+          <AppButton
+            label="슬라이드"
+            variant="secondary"
+            onPress={() => router.push(`/slides?classId=${encodeURIComponent(classItem.id)}`)}
+            style={styles.action}
+          />
+          <AppButton
+            label="디자이너"
+            variant="secondary"
+            onPress={() => router.push(`/designer?classId=${encodeURIComponent(classItem.id)}`)}
+            style={styles.action}
+          />
+          <AppButton
+            label="스케줄러"
+            variant="secondary"
+            onPress={() => router.push(`/scheduler?classId=${encodeURIComponent(classItem.id)}`)}
+            style={styles.action}
+          />
+          <AppButton
+            label="드라이브"
+            variant="secondary"
+            onPress={() => router.push(`/(tabs)/drive?classId=${encodeURIComponent(classItem.id)}`)}
+            style={styles.action}
+          />
         </View>
       </AppCard>
     </AppScreen>

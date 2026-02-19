@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppInput } from '../../src/components/ui/AppInput';
 import { AppButton } from '../../src/components/ui/AppButton';
 import { AppCard } from '../../src/components/ui/AppCard';
 import { AppScreen } from '../../src/components/ui/AppScreen';
-import { colors } from '../../src/theme/colors';
 import { useAuthStore } from '../../src/stores/authStore';
 
 export default function RegisterScreen() {
@@ -34,7 +33,6 @@ export default function RegisterScreen() {
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <AppCard>
             <View style={styles.form}>
-              <Text style={styles.formTitle}>새 계정 만들기</Text>
               <AppInput label="이름" value={name} onChangeText={setName} placeholder="홍길동" />
               <AppInput
                 label="이메일"
@@ -67,11 +65,5 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: 12,
-  },
-  formTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: colors.text,
-    marginBottom: 2,
   },
 });

@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppInput } from '../../src/components/ui/AppInput';
 import { AppButton } from '../../src/components/ui/AppButton';
 import { AppCard } from '../../src/components/ui/AppCard';
 import { AppScreen } from '../../src/components/ui/AppScreen';
-import { colors } from '../../src/theme/colors';
 import { useAuthStore } from '../../src/stores/authStore';
 
 export default function LoginScreen() {
@@ -39,7 +38,6 @@ export default function LoginScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <AppCard>
           <View style={styles.form}>
-            <Text style={styles.formTitle}>로그인</Text>
             <AppInput
               label="이메일"
               placeholder="university@email.com"
@@ -72,11 +70,5 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: 12,
-  },
-  formTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: colors.text,
-    marginBottom: 2,
   },
 });

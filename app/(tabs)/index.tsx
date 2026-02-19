@@ -1,211 +1,281 @@
-import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useMemo } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { AppCard } from '../../src/components/ui/AppCard';
-import { AppButton } from '../../src/components/ui/AppButton';
 import { AppScreen } from '../../src/components/ui/AppScreen';
-import { Reveal } from '../../src/components/ui/Reveal';
 import { colors } from '../../src/theme/colors';
-import { useAuthStore } from '../../src/stores/authStore';
 import { useTimetableStore } from '../../src/stores/timetableStore';
+import { useDocumentStore } from '../../src/stores/documentStore';
+import { useProblemStore } from '../../src/stores/problemStore';
+import { useMeetingStore } from '../../src/stores/meetingStore';
+import { useVideoSummaryStore } from '../../src/stores/videoSummaryStore';
+import { useSlidesStore } from '../../src/stores/slidesStore';
+import { useDesignerStore } from '../../src/stores/designerStore';
+import { useDriveStore } from '../../src/stores/driveStore';
 
-const categoryCards = [
-  { title: 'Mobile App', tasks: '10 Tasks', tone: '#FDF1DE', icon: 'phone-portrait-outline' as const },
-  { title: 'Website', tasks: '05 Tasks', tone: '#EAF4E8', icon: 'globe-outline' as const },
-];
+type Weekday = 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri';
+
+type MaterialItem = {
+  id: string;
+  type: 'doc' | 'problem' | 'meeting' | 'video' | 'slides' | 'design' | 'drive';
+  title: string;
+  createdAt: string;
+};
+
+const jsToWeekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+
+function toDateTime(iso: string) {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? 0 : d.getTime();
+}
+
+function typeLabel(type: MaterialItem['type']) {
+  if (type === 'doc') return '문서';
+  if (type === 'problem') return '문제';
+  if (type === 'meeting') return '회의';
+  if (type === 'video') return '영상';
+  if (type === 'slides') return '슬라이드';
+  if (type === 'design') return '디자인';
+  return '파일';
+}
+
+function weekdayLabel(day: Weekday | null) {
+  if (day === 'Mon') return 'MON';
+  if (day === 'Tue') return 'TUE';
+  if (day === 'Wed') return 'WED';
+  if (day === 'Thu') return 'THU';
+  if (day === 'Fri') return 'FRI';
+  return 'WEEKEND';
+}
 
 export default function HomeScreen() {
-  const user = useAuthStore((state) => state.user);
   const classes = useTimetableStore((state) => state.classes);
+  const slots = useTimetableStore((state) => state.slots);
+
+  const documents = useDocumentStore((state) => state.documents);
+  const problemSets = useProblemStore((state) => state.sets);
+  const meetings = useMeetingStore((state) => state.meetings);
+  const videoSummaries = useVideoSummaryStore((state) => state.summaries);
+  const decks = useSlidesStore((state) => state.decks);
+  const designs = useDesignerStore((state) => state.designs);
+  const driveFiles = useDriveStore((state) => state.files);
+
+  const now = new Date();
+  const currentWeekday = jsToWeekday[now.getDay()];
+  const todayWeekday: Weekday | null =
+    currentWeekday === 'Mon' || currentWeekday === 'Tue' || currentWeekday === 'Wed' || currentWeekday === 'Thu' || currentWeekday === 'Fri'
+      ? currentWeekday
+      : null;
+
+  const todayTimeline = useMemo(() => {
+    if (!todayWeekday) return [];
+
+    return slots
+      .filter((slot) => slot.day === todayWeekday)
+      .map((slot) => {
+        const course = classes.find((item) => item.id === slot.classId);
+        if (!course) return null;
+
+        const materials: MaterialItem[] = [
+          ...documents
+            .filter((item) => item.classId === course.id)
+            .map((item) => ({ id: item.id, type: 'doc' as const, title: item.title, createdAt: item.updatedAt || item.createdAt })),
+          ...problemSets
+            .filter((item) => item.classId === course.id)
+            .map((item) => ({ id: item.id, type: 'problem' as const, title: item.title, createdAt: item.createdAt })),
+          ...meetings
+            .filter((item) => item.classId === course.id)
+            .map((item) => ({ id: item.id, type: 'meeting' as const, title: item.title, createdAt: item.createdAt })),
+          ...videoSummaries
+            .filter((item) => item.classId === course.id)
+            .map((item) => ({ id: item.id, type: 'video' as const, title: item.videoId, createdAt: item.createdAt })),
+          ...decks
+            .filter((item) => item.classId === course.id)
+            .map((item) => ({ id: item.id, type: 'slides' as const, title: item.title, createdAt: item.createdAt })),
+          ...designs
+            .filter((item) => item.classId === course.id)
+            .map((item) => ({ id: item.id, type: 'design' as const, title: item.title, createdAt: item.createdAt })),
+          ...driveFiles
+            .filter((item) => item.classId === course.id)
+            .map((item) => ({ id: item.id, type: 'drive' as const, title: item.name, createdAt: item.createdAt })),
+        ]
+          .sort((a, b) => toDateTime(b.createdAt) - toDateTime(a.createdAt))
+          .slice(0, 2);
+
+        return {
+          classId: course.id,
+          name: course.name,
+          location: course.location,
+          startHour: slot.startHour,
+          endHour: slot.endHour,
+          materials,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null)
+      .sort((a, b) => a.startHour - b.startHour);
+  }, [classes, decks, designs, documents, driveFiles, meetings, problemSets, slots, todayWeekday, videoSummaries]);
 
   return (
-    <AppScreen scroll title="Home">
-      <Reveal delay={20}>
-        <View style={styles.headRow}>
-          <View style={styles.searchWrap}>
-            <Ionicons name="search-outline" size={16} color={colors.textSubtle} />
-            <TextInput style={styles.searchInput} placeholder="Search" placeholderTextColor={colors.textSubtle} />
-          </View>
-          <View style={styles.iconBtn}>
-            <Ionicons name="options-outline" size={17} color="#FFFFFF" />
-          </View>
+    <AppScreen scroll contentStyle={styles.content}>
+      <AppCard>
+        <View style={styles.timelineHeader}>
+          <Text style={styles.dayText}>{weekdayLabel(todayWeekday)}</Text>
+          <Pressable onPress={() => router.push('/(tabs)/timetable')}>
+            <Text style={styles.linkText}>시간표</Text>
+          </Pressable>
         </View>
-      </Reveal>
 
-      <Reveal delay={80}>
-        <Text style={styles.sectionTitle}>Categories</Text>
-        <View style={styles.categoryRow}>
-          {categoryCards.map((item) => (
-            <View key={item.title} style={[styles.categoryCard, { backgroundColor: item.tone }]}>
-              <Text style={styles.categoryTitle}>{item.title}</Text>
-              <Text style={styles.categoryTasks}>{item.tasks}</Text>
-              <View style={styles.categoryIcon}>
-                <Ionicons name={item.icon} size={18} color={colors.text} />
+        <View style={styles.trackWrap}>
+          <View style={styles.trackLine} />
+
+          <View style={styles.itemsWrap}>
+            {todayTimeline.length === 0 ? (
+              <View style={styles.emptyCard}>
+                <Text style={styles.emptyText}>오늘 수업 없음</Text>
               </View>
-            </View>
-          ))}
-        </View>
-      </Reveal>
+            ) : null}
 
-      <Reveal delay={150}>
-        <View style={styles.ongoingTitleRow}>
-          <Text style={styles.sectionTitle}>Ongoing tasks</Text>
-          <Text style={styles.seeAll}>See all</Text>
-        </View>
-        <AppCard>
-          <Text style={styles.taskTitle}>Wallet App Design</Text>
-          <Text style={styles.taskMeta}>Team members · {user?.name ?? 'student'}</Text>
-          <View style={styles.progressRow}>
-            <Text style={styles.taskTime}>2:30 PM - 6:00 PM</Text>
-            <View style={styles.progressBadge}><Text style={styles.progressText}>46%</Text></View>
-          </View>
-        </AppCard>
-      </Reveal>
+            {todayTimeline.map((item) => (
+              <Pressable key={`${item.classId}-${item.startHour}`} style={styles.classCard} onPress={() => router.push(`/class/${item.classId}`)}>
+                <View style={styles.classHead}>
+                  <Text style={styles.className}>{item.name}</Text>
+                  <Text style={styles.classTime}>
+                    {item.startHour.toString().padStart(2, '0')}:00 - {item.endHour.toString().padStart(2, '0')}:00
+                  </Text>
+                </View>
+                <Text style={styles.classLocation}>{item.location}</Text>
 
-      <Reveal delay={220}>
-        <AppCard>
-          <Text style={styles.taskTitle}>Dashboard & Mobile App</Text>
-          <Text style={styles.taskMeta}>Review and final polish</Text>
-          <View style={styles.progressRow}>
-            <Text style={styles.taskTime}>9:30 AM - 11:30 AM</Text>
-            <View style={[styles.progressBadge, styles.progressBlue]}><Text style={styles.progressText}>76%</Text></View>
+                <View style={styles.metaRow}>
+                  {item.materials.length === 0 ? (
+                    <Text style={styles.metaText}>최근 자료 없음</Text>
+                  ) : (
+                    item.materials.map((m) => (
+                      <View key={m.id} style={styles.metaChip}>
+                        <Text style={styles.metaType}>{typeLabel(m.type)}</Text>
+                        <Text numberOfLines={1} style={styles.metaTitle}>{m.title}</Text>
+                      </View>
+                    ))
+                  )}
+                </View>
+              </Pressable>
+            ))}
           </View>
-          <AppButton label="시간표 열기" onPress={() => router.push('/(tabs)/timetable')} style={styles.openButton} />
-        </AppCard>
-      </Reveal>
+        </View>
+      </AppCard>
     </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  headRow: {
+  content: {
+    paddingTop: 4,
+  },
+  timelineHeader: {
     flexDirection: 'row',
-    gap: 8,
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 10,
   },
-  searchWrap: {
-    flex: 1,
-    height: 42,
-    borderRadius: 21,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: '#F5F7FB',
-    paddingHorizontal: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
+  dayText: {
     color: colors.text,
+    fontSize: 22,
+    fontWeight: '900',
+    letterSpacing: 0.3,
   },
-  iconBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#0B0C11',
-    alignItems: 'center',
-    justifyContent: 'center',
+  linkText: {
+    color: colors.primaryStrong,
+    fontSize: 12,
+    fontWeight: '800',
   },
-  sectionTitle: {
-    fontSize: 21,
-    fontWeight: '600',
-    fontFamily: Platform.select({ ios: 'AvenirNext-DemiBold', android: 'sans-serif-medium' }),
-    color: colors.text,
-    letterSpacing: -0.2,
-  },
-  categoryRow: {
+  trackWrap: {
     flexDirection: 'row',
     gap: 10,
-    marginTop: 6,
-    paddingBottom: 2,
   },
-  categoryCard: {
+  trackLine: {
+    width: 3,
+    borderRadius: 99,
+    backgroundColor: '#D8DEEC',
+    marginTop: 6,
+    marginBottom: 6,
+  },
+  itemsWrap: {
     flex: 1,
-    borderRadius: 16,
+    gap: 10,
+  },
+  emptyCard: {
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: 13,
-    paddingVertical: 11,
-    minHeight: 120,
+    backgroundColor: '#F7F9FF',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
   },
-  categoryTitle: {
-    color: colors.text,
-    fontWeight: '600',
-    fontFamily: Platform.select({ ios: 'AvenirNext-DemiBold', android: 'sans-serif-medium' }),
-    fontSize: 15,
-  },
-  categoryTasks: {
-    marginTop: 4,
+  emptyText: {
     color: colors.textMuted,
     fontSize: 13,
-    fontWeight: '500',
-    fontFamily: Platform.select({ ios: 'AvenirNext-Medium', android: 'sans-serif' }),
+    fontWeight: '700',
   },
-  categoryIcon: {
-    marginTop: 'auto',
-    alignSelf: 'flex-end',
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  classCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#D8DEEC',
+    backgroundColor: '#F3F5FB',
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+    gap: 4,
   },
-  ongoingTitleRow: {
+  classHead: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 6,
+    alignItems: 'center',
+    gap: 8,
   },
-  seeAll: {
+  className: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '800',
+    flex: 1,
+  },
+  classTime: {
     color: colors.textSubtle,
     fontSize: 11,
     fontWeight: '700',
   },
-  taskTitle: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: '600',
-    fontFamily: Platform.select({ ios: 'AvenirNext-DemiBold', android: 'sans-serif-medium' }),
-  },
-  taskMeta: {
-    marginTop: 5,
+  classLocation: {
     color: colors.textMuted,
-    fontSize: 13,
-    fontFamily: Platform.select({ ios: 'AvenirNext-Medium', android: 'sans-serif' }),
-  },
-  progressRow: {
-    marginTop: 9,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  taskTime: {
-    color: colors.textSubtle,
     fontSize: 12,
     fontWeight: '600',
-    fontFamily: Platform.select({ ios: 'AvenirNext-DemiBold', android: 'sans-serif-medium' }),
+    marginBottom: 4,
   },
-  progressBadge: {
-    borderRadius: 999,
-    backgroundColor: '#EEF0FA',
+  metaRow: {
+    gap: 6,
+  },
+  metaText: {
+    color: colors.textSubtle,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  metaChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     borderWidth: 1,
-    borderColor: '#DFE4F7',
-    paddingHorizontal: 10,
-    paddingVertical: 3,
+    borderColor: '#E2E7F3',
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
   },
-  progressBlue: {
-    backgroundColor: '#E7EDFF',
-    borderColor: '#D5DFFD',
-  },
-  progressText: {
-    color: colors.text,
+  metaType: {
+    color: colors.primaryStrong,
     fontSize: 10,
     fontWeight: '800',
+    minWidth: 32,
   },
-  openButton: {
-    marginTop: 12,
+  metaTitle: {
+    color: colors.text,
+    fontSize: 11,
+    fontWeight: '600',
+    flex: 1,
   },
 });

@@ -16,14 +16,14 @@ type ToolItem = {
 };
 
 const tools: ToolItem[] = [
-  { label: 'AI 채팅', path: '/chat', subtitle: '수업 문맥 기반 질의응답', badge: 'Phase 2', icon: 'chatbubble-ellipses-outline', tone: '#FDF3E5' },
-  { label: 'AI 슬라이드', path: '/slides', subtitle: '목차부터 발표자료 자동 생성', badge: 'Phase 7', icon: 'easel-outline', tone: '#EAF6E9' },
-  { label: 'AI 문서', path: '/documents', subtitle: '요약/확장/정리 문서 편집', badge: 'Phase 6', icon: 'document-text-outline', tone: '#E9F2FF' },
-  { label: 'AI 디자이너', path: '/designer', subtitle: '포스터 콘셉트와 시안 생성', badge: 'Phase 8', icon: 'color-wand-outline', tone: '#F7ECFF' },
-  { label: 'AI 스케줄러', path: '/scheduler', subtitle: '과제 마감 중심 일정 추천', badge: 'Phase 9', icon: 'calendar-number-outline', tone: '#F2F5FF' },
-  { label: 'AI 영상 요약', path: '/video-summary', subtitle: '강의 영상 포인트 타임라인', badge: 'Phase 4', icon: 'videocam-outline', tone: '#E8F8FA' },
-  { label: 'AI 문제', path: '/problems', subtitle: '문제 생성, 채점, 해설까지', badge: 'Phase 5', icon: 'help-circle-outline', tone: '#FFF2E8' },
-  { label: 'AI 회의', path: '/meeting', subtitle: '녹음-전사-액션아이템 연결', badge: 'Phase 3', icon: 'people-outline', tone: '#EEF7EE' },
+  { label: 'AI 채팅', path: '/chat', subtitle: '질문하기', badge: 'Phase 2', icon: 'chatbubble-ellipses-outline', tone: '#FDF3E5' },
+  { label: 'AI 슬라이드', path: '/slides', subtitle: 'PPT 생성', badge: 'Phase 7', icon: 'easel-outline', tone: '#EAF6E9' },
+  { label: 'AI 문서', path: '/documents', subtitle: '문서 작성', badge: 'Phase 6', icon: 'document-text-outline', tone: '#E9F2FF' },
+  { label: 'AI 디자이너', path: '/designer', subtitle: '시안 생성', badge: 'Phase 8', icon: 'color-wand-outline', tone: '#F7ECFF' },
+  { label: 'AI 스케줄러', path: '/scheduler', subtitle: '일정 추천', badge: 'Phase 9', icon: 'calendar-number-outline', tone: '#F2F5FF' },
+  { label: 'AI 영상 요약', path: '/video-summary', subtitle: '영상 요약', badge: 'Phase 4', icon: 'videocam-outline', tone: '#E8F8FA' },
+  { label: 'AI 문제', path: '/problems', subtitle: '문제 생성', badge: 'Phase 5', icon: 'help-circle-outline', tone: '#FFF2E8' },
+  { label: 'AI 회의', path: '/meeting', subtitle: '회의 정리', badge: 'Phase 3', icon: 'people-outline', tone: '#EEF7EE' },
 ];
 
 export default function ToolsScreen() {
